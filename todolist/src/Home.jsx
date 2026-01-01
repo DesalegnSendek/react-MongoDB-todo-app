@@ -10,12 +10,12 @@ function Home() {
   const inputRef = useRef(null);
   const ignoreBlurRef = useRef(false);
   const [searchQuery, setSearchQuery] = useState("");
-  const [itemsPerPage, setItemsPerPage] = useState(10);
+  const [itemsPerPage, setItemsPerPage] = useState(20);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalCount, setTotalCount] = useState(0);
 
   const fetchTodos = async (q = "", page = 1, per = itemsPerPage) => {
-    try {
+  try {
       const url = `http://localhost:3001/search?q=${encodeURIComponent(
         q
       )}&page=${page}&perPage=${per}`;
@@ -72,7 +72,7 @@ function Home() {
         }
       }
     } catch (err) {
-      // ignore calculation errors
+      
     }
 
     setEditingId(todo._id);
@@ -136,7 +136,7 @@ function Home() {
   const displayedTodos = todos;
 
   return (
-    <div>
+    <div className="app-container">
       <h1 id="headerTilte">Add To Do Lists</h1>
       <Create
         onAdd={() => {

@@ -1,46 +1,51 @@
+.app-container {
+  max-width: 720px;
+  margin: 12px auto;
+  padding: 0 12px;
+}
+
 input,
 select,
 textarea {
-  width: 300px;
-  padding: 12px;
-  margin: 10px 0;
+  width: 100%;
+  padding: 8px;
+  margin: 6px 0;
   border: 1px solid #ddd;
   border-radius: 6px;
-  font-size: 1rem;
-  margin-left: 500px;
+  font-size: 0.95rem;
 }
-
 button {
   background-color: #6366f1;
   color: white;
-  margin-left: 10px;
-  padding: 12px 24px;
+  margin-left: 6px;
+  padding: 8px 12px;
   border: none;
   border-radius: 6px;
   cursor: pointer;
   font-weight: 600;
-  transition: background 0.3s ease;
-}
+  font-size: 0.95rem;
+  transition: background 0.2s ease;
+} 
 
 button:hover {
   background-color: #4f46e5;
 }
 
 .task {
-  margin-left: 500px;
   display: flex;
   align-items: center;
-  width: 345px;
+  width: 100%;
   background-color: black;
   color: white;
-  height: 40px;
-  padding: 4px 6px;
-  margin-top: 8px;
-  border-radius: 6px;
+  min-height: 14px;
+  padding: 6px 8px;
+  margin-top: 6px;
+  border-radius: 4px;
+  font-size: 0.92rem;
 }
 
 .task .right {
-  width: 30px;
+  width: 32px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -50,7 +55,8 @@ button:hover {
 .task .content {
   flex: 1;
   margin: 0 8px;
-}
+  word-break: break-word;
+} 
 
 .left-icon,
 .right-icon {
@@ -58,24 +64,27 @@ button:hover {
 }
 
 .edit-row input {
-  width: 180px;
+  width: 100%;
+  max-width: 320px;
   padding: 6px;
   border-radius: 4px;
   border: 1px solid #ddd;
+  font-size: 0.95rem;
 }
 
 .edit-row button {
   margin-left: 6px;
-  padding: 6px 10px;
+  padding: 6px 8px;
   border-radius: 4px;
   border: none;
   cursor: pointer;
-}
+  font-size: 0.9rem;
+} 
 
 .list-controls {
-  margin-top: 12px;
+  margin-top: 8px;
   display: flex;
-  gap: 8px;
+  gap: 6px;
   align-items: center;
 }
 
@@ -85,7 +94,7 @@ button:hover {
 }
 
 .list-controls select {
-  padding: 8px 10px;
+  padding: 6px 8px;
   border-radius: 6px;
   border: 1px solid #ddd;
   background: white;
@@ -93,7 +102,7 @@ button:hover {
 }
 
 .list-info {
-  margin-left: 12px;
+  margin-left: 8px;
   color: #333;
   font-weight: 600;
 }
@@ -121,21 +130,17 @@ button:hover {
   cursor: pointer;
 }
 #headerTilte {
-  margin-left: 500px;
+  margin: 0 0 12px 0;
 }
 #list-controls {
-  margin-left: 500px;
   margin-top: 15px;
 }
 #showlable {
   font-weight: 600;
-  margin-left: 400px;
-  margin-right: 0;
-  padding-right: 0px;
-  
+  margin: 0 0 0 0;
 }
 .pagination-controls {
-  margin-left: 500px;
-  margin-top: 5px;
+  margin-top: 12px;
   margin-bottom: 25px;
+  margin-right: 20px;
 }
