@@ -11,18 +11,46 @@ function Home() {
   const ignoreBlurRef = useRef(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [itemsPerPage, setItemsPerPage] = useState(10);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalCount, setTotalCount] = useState(0);
 
+  const fetchTodos = async (q = "", page = 1, per = itemsPerPage) => {
+    try {
+      const url = `http://localhost:3001/search?q=${encodeURIComponent(
+        q
+      )}&page=${page}&perPage=${per}`;
+      const res = await axios.get(url);
+      setTodos(res.data.items || []);
+      setTotalCount(res.data.total || 0);
+      setCurrentPage(page);
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  // reset page when search or page size changes
   useEffect(() => {
-    axios
-      .get("http://localhost:3001/get")
-      .then((result) => setTodos(result.data))
-      .catch((err) => console.error(err));
-  }, []);
+    setCurrentPage(1);
+  }, [searchQuery, itemsPerPage]);
+
+  // fetch when search, page or page size changes
+  useEffect(() => {
+    fetchTodos(searchQuery, currentPage, itemsPerPage);
+  }, [searchQuery, currentPage, itemsPerPage]);
 
   const handleDelete = async (id) => {
     try {
       await axios.delete(`http://localhost:3001/delete/${id}`);
-      setTodos((prev) => prev.filter((t) => t._id !== id));
+      // adjust pagination if needed (if current page becomes empty after deletion)
+      const newTotal = Math.max(0, totalCount - 1);
+      const totalPages =
+        itemsPerPage === 0
+          ? 1
+          : Math.max(1, Math.ceil(newTotal / itemsPerPage));
+      const newPage = Math.min(currentPage, totalPages);
+      setCurrentPage(newPage);
+      // fetch the page (newPage may be same as current)
+      fetchTodos(searchQuery, newPage, itemsPerPage);
     } catch (err) {
       console.error(err);
     }
@@ -75,9 +103,10 @@ function Home() {
       const res = await axios.put(`http://localhost:3001/update/${id}`, {
         text: editingText,
       });
-      setTodos((prev) => prev.map((t) => (t._id === id ? res.data : t)));
+      // re-fetch to ensure consistency with server side views/pagination
       setEditingId(null);
       setEditingText("");
+      fetchTodos(searchQuery, currentPage, itemsPerPage);
     } catch (err) {
       console.error(err);
     }
@@ -88,7 +117,7 @@ function Home() {
       const pos =
         editingCaretPos != null ? editingCaretPos : editingText.length;
       const p = Math.max(0, Math.min(pos, editingText.length));
-      // wait a tick for the input to be present/focused
+
       setTimeout(() => {
         if (inputRef.current) {
           inputRef.current.focus();
@@ -103,16 +132,17 @@ function Home() {
     }
   }, [editingId]);
 
-  // Filter todos locally based on searchQuery
-  const displayedTodos = todos.filter((t) =>
-    t.text.toLowerCase().includes(searchQuery.trim().toLowerCase())
-  );
+  // Server provides filtered results based on `searchQuery` so display them directly
+  const displayedTodos = todos;
 
   return (
     <div>
       <h1 id="headerTilte">Add To Do Lists</h1>
       <Create
-        onAdd={(todo) => setTodos((prev) => [todo, ...prev])}
+        onAdd={() => {
+          // Re-fetch current page to reflect server state after add
+          fetchTodos(searchQuery, currentPage, itemsPerPage);
+        }}
         onSearch={(q) => setSearchQuery(q || "")}
       />
 
@@ -178,24 +208,42 @@ function Home() {
             ));
           })()}
 
-          <div id="list-controls">
-            <button type="button" onClick={() => setItemsPerPage(10)}>
-              Show 10
-            </button>
-            <button type="button" onClick={() => setItemsPerPage(20)}>
-              Show 20
-            </button>
-            <button type="button" onClick={() => setItemsPerPage(0)}>
-              Show All
-            </button>
+          <div className="list-controls">
+            <select
+              id="itemsPerPageSelect"
+              value={itemsPerPage}
+              onChange={(e) => setItemsPerPage(Number(e.target.value))}>
+              <option value={10}>10</option>
+              <option value={20}>20</option>
+              <option value={0}>All</option>
+            </select>
             <span className="list-info">
-              Showing{" "}
-              {Math.min(
-                itemsPerPage === 0 ? displayedTodos.length : itemsPerPage,
-                displayedTodos.length
-              )}{" "}
-              of {displayedTodos.length}
+              Showing {todos.length} of {totalCount}
             </span>
+          </div>
+
+          <div className="pagination-controls">
+            <button
+              type="button"
+              disabled={currentPage <= 1}
+              onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}>
+              Prev
+            </button>
+            <span className="page-info">
+              Page {currentPage} of{" "}
+              {itemsPerPage === 0
+                ? 1
+                : Math.max(1, Math.ceil(totalCount / itemsPerPage))}
+            </span>
+            <button
+              type="button"
+              disabled={
+                itemsPerPage !== 0 &&
+                currentPage >= Math.max(1, Math.ceil(totalCount / itemsPerPage))
+              }
+              onClick={() => setCurrentPage((p) => p + 1)}>
+              Next
+            </button>
           </div>
         </>
       )}

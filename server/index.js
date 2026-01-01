@@ -12,11 +12,51 @@ mongoose
   .then(() => console.log("Connected to MongoDB"))
   .catch((err) => console.error("MongoDB connection error:", err));
 
-app.get("/get", (req, res) => {
-  todoModel
-    .find()
-    .then((results) => res.json(results))
-    .catch((err) => res.status(500).json({ error: err.message }));
+app.get("/get", async (req, res) => {
+  try {
+    const page = Math.max(1, parseInt(req.query.page) || 1);
+    const perPageRaw = req.query.perPage;
+    const perPage = perPageRaw === undefined ? 10 : parseInt(perPageRaw);
+
+    if (perPage === 0) {
+      const items = await todoModel.find();
+      return res.json({ items, total: items.length });
+    }
+
+    const skip = (page - 1) * perPage;
+    const [items, total] = await Promise.all([
+      todoModel.find().skip(skip).limit(perPage),
+      todoModel.countDocuments(),
+    ]);
+    res.json({ items, total });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// Search todos by query string (case-insensitive substring match) with pagination
+app.get("/search", async (req, res) => {
+  try {
+    const q = (req.query.q || "").trim();
+    const filter = q ? { text: { $regex: q, $options: "i" } } : {};
+    const page = Math.max(1, parseInt(req.query.page) || 1);
+    const perPageRaw = req.query.perPage;
+    const perPage = perPageRaw === undefined ? 10 : parseInt(perPageRaw);
+
+    if (perPage === 0) {
+      const items = await todoModel.find(filter);
+      return res.json({ items, total: items.length });
+    }
+
+    const skip = (page - 1) * perPage;
+    const [items, total] = await Promise.all([
+      todoModel.find(filter).skip(skip).limit(perPage),
+      todoModel.countDocuments(filter),
+    ]);
+    res.json({ items, total });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
 });
 
 app.post("/add", (req, res) => {

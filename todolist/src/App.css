@@ -79,10 +79,28 @@ button:hover {
   align-items: center;
 }
 
+.list-controls label {
+  font-weight: 600;
+  margin-right: 6px;
+}
+
+.list-controls select {
+  padding: 8px 10px;
+  border-radius: 6px;
+  border: 1px solid #ddd;
+  background: white;
+  cursor: pointer;
+}
+
 .list-info {
   margin-left: 12px;
   color: #333;
   font-weight: 600;
+}
+
+.list-controls button.active {
+  background-color: #4f46e5;
+  box-shadow: 0 0 0 2px rgba(79, 70, 229, 0.12);
 }
 
 .checkbox {
@@ -108,4 +126,16 @@ button:hover {
 #list-controls {
   margin-left: 500px;
   margin-top: 15px;
+}
+#showlable {
+  font-weight: 600;
+  margin-left: 400px;
+  margin-right: 0;
+  padding-right: 0px;
+  
+}
+.pagination-controls {
+  margin-left: 500px;
+  margin-top: 5px;
+  margin-bottom: 25px;
 }
