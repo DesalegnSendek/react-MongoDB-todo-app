@@ -39,7 +39,6 @@ button:hover {
   border-radius: 6px;
 }
 
-.task .left,
 .task .right {
   width: 30px;
   display: flex;
@@ -73,6 +72,19 @@ button:hover {
   cursor: pointer;
 }
 
+.list-controls {
+  margin-top: 12px;
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.list-info {
+  margin-left: 12px;
+  color: #333;
+  font-weight: 600;
+}
+
 .checkbox {
   display: flex;
   align-items: center;
@@ -89,4 +101,11 @@ button:hover {
 
 .task div .icon {
   cursor: pointer;
+}
+#headerTilte {
+  margin-left: 500px;
+}
+#list-controls {
+  margin-left: 500px;
+  margin-top: 15px;
 }

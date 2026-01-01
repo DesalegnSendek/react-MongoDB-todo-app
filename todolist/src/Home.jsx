@@ -10,6 +10,7 @@ function Home() {
   const inputRef = useRef(null);
   const ignoreBlurRef = useRef(false);
   const [searchQuery, setSearchQuery] = useState("");
+  const [itemsPerPage, setItemsPerPage] = useState(10);
 
   useEffect(() => {
     axios
@@ -109,7 +110,7 @@ function Home() {
 
   return (
     <div>
-      <h1>Add To Do Lists</h1>
+      <h1 id="headerTilte">Add To Do Lists</h1>
       <Create
         onAdd={(todo) => setTodos((prev) => [todo, ...prev])}
         onSearch={(q) => setSearchQuery(q || "")}
@@ -120,56 +121,83 @@ function Home() {
       {displayedTodos.length === 0 ? (
         <p>No todos available</p>
       ) : (
-        displayedTodos.map((todo) => (
-          <div key={todo._id} className="task">
-            <div className="left" onClick={() => startEdit(todo)} title="Edit">
-              <span className="icon left-icon">✏️</span>
-            </div>
-            <div className="content">
-              {editingId === todo._id ? (
-                <div className="edit-row">
-                  <input
-                    ref={inputRef}
-                    value={editingText}
-                    onChange={(e) => setEditingText(e.target.value)}
-                    onKeyDown={(e) => {
-                      if (e.key === "Enter") {
-                        saveEdit(todo._id, todo.text);
-                      }
-                    }}
-                    onBlur={() => {
-                      if (ignoreBlurRef.current) {
-                        ignoreBlurRef.current = false;
-                        return;
-                      }
-                      saveEdit(todo._id, todo.text);
-                    }}
-                  />
-                  <button
-                    type="button"
-                    onMouseDown={() => (ignoreBlurRef.current = true)}
-                    onClick={() => saveEdit(todo._id, todo.text)}>
-                    Save
-                  </button>
-                  <button
-                    type="button"
-                    onMouseDown={() => (ignoreBlurRef.current = true)}
-                    onClick={cancelEdit}>
-                    Cancel
-                  </button>
+        <>
+          {(() => {
+            const paged =
+              itemsPerPage === 0
+                ? displayedTodos
+                : displayedTodos.slice(0, itemsPerPage);
+            return paged.map((todo) => (
+              <div key={todo._id} className="task">
+                <div className="content">
+                  {editingId === todo._id ? (
+                    <div className="edit-row">
+                      <input
+                        ref={inputRef}
+                        value={editingText}
+                        onChange={(e) => setEditingText(e.target.value)}
+                        onKeyDown={(e) => {
+                          if (e.key === "Enter") {
+                            saveEdit(todo._id, todo.text);
+                          }
+                        }}
+                        onBlur={() => {
+                          if (ignoreBlurRef.current) {
+                            ignoreBlurRef.current = false;
+                            return;
+                          }
+                          saveEdit(todo._id, todo.text);
+                        }}
+                      />
+                      <button
+                        type="button"
+                        onMouseDown={() => (ignoreBlurRef.current = true)}
+                        onClick={() => saveEdit(todo._id, todo.text)}>
+                        Save
+                      </button>
+                      <button
+                        type="button"
+                        onMouseDown={() => (ignoreBlurRef.current = true)}
+                        onClick={cancelEdit}>
+                        Cancel
+                      </button>
+                    </div>
+                  ) : (
+                    <h3 onDoubleClick={(e) => startEdit(todo, e)}>
+                      {todo.text}
+                    </h3>
+                  )}
                 </div>
-              ) : (
-                <h3 onDoubleClick={(e) => startEdit(todo, e)}>{todo.text}</h3>
-              )}
-            </div>
-            <div
-              className="right"
-              onClick={() => handleDelete(todo._id)}
-              title="Delete">
-              <span className="icon right-icon">🗑️</span>
-            </div>
+                <div
+                  className="right"
+                  onClick={() => handleDelete(todo._id)}
+                  title="Delete">
+                  <span className="icon right-icon">🗑️</span>
+                </div>
+              </div>
+            ));
+          })()}
+
+          <div id="list-controls">
+            <button type="button" onClick={() => setItemsPerPage(10)}>
+              Show 10
+            </button>
+            <button type="button" onClick={() => setItemsPerPage(20)}>
+              Show 20
+            </button>
+            <button type="button" onClick={() => setItemsPerPage(0)}>
+              Show All
+            </button>
+            <span className="list-info">
+              Showing{" "}
+              {Math.min(
+                itemsPerPage === 0 ? displayedTodos.length : itemsPerPage,
+                displayedTodos.length
+              )}{" "}
+              of {displayedTodos.length}
+            </span>
           </div>
-        ))
+        </>
       )}
     </div>
   );
